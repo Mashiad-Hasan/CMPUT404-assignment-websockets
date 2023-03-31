@@ -27,7 +27,7 @@
     <div class="container"></div>
         <h1>Canvas</h1>
         <button id="clearBtn">Clear Canvas</button>
-        <canvas id="c" width="10%" height="10%"></canvas> 
+        <canvas id="c" width="100%" height="100%"></canvas> 
     
     <div id="debug"></div>
 
@@ -326,8 +326,8 @@ function wsSetup() {
             console.log("WebSocket message received:", event.data);
             if (message.action === 'clear') {
             // Clear the canvas and redraw the frame
-            console.log('here')
-            
+                world = {};
+                drawNextFrame();
             } 
             else {
             // Here we can handle the WebSocket message received from the server
