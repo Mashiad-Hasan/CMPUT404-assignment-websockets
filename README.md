@@ -17,6 +17,10 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
+References
+=======
+- sockets.py contains code modified from https://github.com/abramhindle/WebSocketsExamples/blob/master/chat.py
+
 Contributors / Licensing
 ========================
 
