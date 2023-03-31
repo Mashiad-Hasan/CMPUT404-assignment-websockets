@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 import flask
-from flask import Flask, request
+from flask import Flask, request, jsonify
 from flask_sockets import Sockets
 import gevent
 from gevent import queue
@@ -103,7 +103,13 @@ def read_ws(ws,client):
             print("WS RECV: {}".format(msg))
             if (msg is not None):
                 packet = json.loads(msg)
-                send_all_json( packet )
+                # update the world state on the server
+                # entity = packet['entity']
+                # data = packet['data']
+                # myWorld.set(entity, data)
+                print(packet)
+                # print(jsonify(myWorld.world()))
+                send_all_json(packet)
             else:
                 break
     except:

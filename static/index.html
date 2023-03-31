@@ -1,6 +1,7 @@
 <!DOCTYPE HTML>
 <html> 
   <head> 
+    <link rel="stylesheet" type="text/css" href="styles.css"/>
     <title>Websockets Assignment</title> 
     <meta charset="utf-8" /> 
     <meta content='width=device-width; height=device-height; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;' name='viewport' />
@@ -21,10 +22,14 @@
         limitations under the License.
     "/>
     <script src="json2.js"></script>
-  </head> 
-  <body bgcolor="white" height="100%" width="100%"> 
+  </head>
+  <body bgcolor="#F5F5DC" height="100%" width="100%"> 
+    <div class="container"></div>
+        <h1>Canvas</h1>
+        <button id="clearBtn">Clear Canvas</button>
+        <canvas id="c" width="10%" height="10%"></canvas> 
+    
     <div id="debug"></div>
-    <canvas id="c" width="100%" height="100%" style="-webkit-tap-highlight-color: transparent;"></canvas> 
 
     <script>
       // Fix me
@@ -40,7 +45,7 @@ function debug(str) {
     var debugDiv = document.getElementById('debug');
     debugDiv.innerHTML = "" + str;
 }
-debug("Test");
+//debug("Test");
 
 world = {};
 
@@ -58,6 +63,26 @@ function drawCircle(context,entity) {
         stroke();                                
     }
 }
+
+// function drawCircle(context, entity) {
+//   const { x, y, colour, radius = 50 } = entity;
+  
+//   context.beginPath();
+//   context.lineWidth = 3;
+//   context.strokeStyle = colour;
+//   context.arc(x, y, radius, 0, 2.0 * Math.PI, false);
+//   context.stroke();
+  
+//   // Add some gradient shading to the circle
+//   const gradient = context.createRadialGradient(x, y, radius / 2, x, y, radius);
+//   gradient.addColorStop(0, 'rgba(255, 255, 255, 0.7)');
+//   gradient.addColorStop(1, colour);
+//   context.fillStyle = gradient;
+//   context.fill();
+// }
+
+
+
 
 function prepEntity(entity) {
     if (!entity["colour"]) {
@@ -87,7 +112,7 @@ function renderFrame() {
     }
 }
 
-var drawNext = true;
+var drawNext = false;
 // Signals that there's something to be drawn
 function drawNextFrame() {
     drawNext = true;
@@ -125,10 +150,18 @@ function addEntity(entity, data) {
     world[entity] = data;
     drawNextFrame(); // (but should we?)
     //XXX: Send a XHTML Request that updates the entity you just modified!
+
+     // send a message to the server to update the world state
+     var message = {
+        'entity': entity,
+        'data': data
+    };
+    socket.send(JSON.stringify(message));
+
 }
 var counter = 0;
 function addEntityWithoutName(data) {
-    var name = "X"+(counter++)%100;
+    var name = "X"+(counter++)%1000;
     addEntity(name,data);
 }
 
@@ -249,27 +282,86 @@ function update() {
 }
 
 
+// function wsSetup() {
+//     var url = "ws://"+host+"/subscribe";   
+//     socket = new WebSocket(url);
+//     socket.onopen = function() {
+//         //XXX: TODO What are you going to do here?
+//     };
+//     socket.onerror = function(msg) {
+//         debug("WebSocket Error:" + msg.data);
+//     };
+//     socket.onmessage = function(msg) {  
+//         try {
+//             debug("WebSocket Recv:" + msg.data);
+//             //XXX: TODO What are you going to do here?            
+//         } catch (e) {
+//             alert("socket on message: " + e);
+//         }
+//     }; 
+// }
+
 function wsSetup() {
-    var url = "ws://"+host+"/subscribe";   
+    var url = "ws://" + host + "/subscribe";   
     socket = new WebSocket(url);
     socket.onopen = function() {
-        //XXX: TODO What are you going to do here?
+        console.log("WebSocket connection established");
+
+        // Add event listener for the clear button
+        var clearBtn = document.getElementById('clearBtn');
+        clearBtn.addEventListener('click', function() {
+            // Send a message to the server to clear the canvas
+            var message = {
+                'action': 'clear'
+            };
+            socket.send(JSON.stringify(message));
+            
+        });
     };
-    socket.onerror = function(msg) {
-        debug("WebSocket Error:" + msg.data);
+    socket.onerror = function(error) {
+        console.log("WebSocket error:", error);
     };
-    socket.onmessage = function(msg) {  
+    socket.onmessage = function(event) {  
         try {
-            debug("WebSocket Recv:" + msg.data);
-            //XXX: TODO What are you going to do here?            
+            console.log("WebSocket message received:", event.data);
+            if (message.action === 'clear') {
+            // Clear the canvas and redraw the frame
+            console.log('here')
+            
+            } 
+            else {
+            // Here we can handle the WebSocket message received from the server
+            // We can parse the message data and update the world
+                var data = JSON.parse(event.data);
+                addEntity(data.entity, data.data);
+            }
         } catch (e) {
-            alert("socket on message: " + e);
+            console.error("Error handling WebSocket message:", e);
         }
     }; 
 }
 
 wsSetup();
 
+// var clearBtn = document.getElementById('clearBtn');
+// clearBtn.addEventListener('click', function() {
+// fetch('/clear', {
+//     method: 'POST'
+// })
+// .then(response => {
+//     if (response.ok) {
+//     // Canvas was cleared successfully
+//     drawNextFrame();
+//     update();
+//     } else {
+//     // Handle error response
+//     throw new Error('Failed to clear canvas');
+//     }
+// })
+// .catch(error => {
+//     alert('Error: ' + error.message);
+// });
+//   });
 
 
 
