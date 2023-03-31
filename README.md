@@ -59,7 +59,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 Contributors
 ============
-
+* Mashiad Hasan (new)
 * Mark Galloway
 * Abram Hindle
 * Cole Mackenzie
