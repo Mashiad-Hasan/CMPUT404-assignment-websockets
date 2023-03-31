@@ -104,9 +104,9 @@ def read_ws(ws,client):
             if (msg is not None):
                 packet = json.loads(msg)
                 # update the world state on the server
-                # entity = packet['entity']
-                # data = packet['data']
-                # myWorld.set(entity, data)
+                entity = packet['entity']
+                data = packet['data']
+                myWorld.set(entity, data)
                 print(packet)
                 # print(jsonify(myWorld.world()))
                 send_all_json(packet)
