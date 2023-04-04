@@ -103,12 +103,15 @@ def read_ws(ws,client):
             print("WS RECV: {}".format(msg))
             if (msg is not None):
                 packet = json.loads(msg)
-                # update the world state on the server
-                entity = packet['entity']
-                data = packet['data']
-                myWorld.set(entity, data)
-                print(packet)
-                # print(jsonify(myWorld.world()))
+                if "entity" in packet and "data" in packet:
+                    entity = packet["entity"]
+                    data = packet["data"]
+                    if isinstance(data, dict):
+                        for key, value in data.items():
+                            myWorld.update(entity, key, value)
+                    else:
+                        myWorld.set(entity, data)
+               
                 send_all_json(packet)
             else:
                 break
@@ -119,7 +122,7 @@ def read_ws(ws,client):
 def subscribe_socket(ws):
     '''Fufill the websocket URL of /subscribe, every update notify the
        websocket and read updates from the websocket '''
-    # XXX: TODO IMPLEMENT ME
+    
     client = Client()
     clients.append(client)
     g = gevent.spawn( read_ws, ws, client )    
